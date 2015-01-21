@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -93,6 +94,10 @@ func printResult(body io.Reader) {
 }
 
 func main() {
+	http.DefaultTransport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	config, err := loadConfiguration()
 	if err != nil {
 		log.Fatal("Error reading config file", err)
