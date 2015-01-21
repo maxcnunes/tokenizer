@@ -2,24 +2,57 @@
 
 Generates oauth2 tokens
 
+Working with micro services and oauth2 authentications can cause such hard work generating new access tokens for different clients and generating new tokens when the previous one has expired. Due that I created this tool to help generating new tokens.
 
-Configuration file **tokenizer.json**:
+## Install
+
+```bash
+go get -u github.com/maxcnunes/tokenizer
+```
+
+## Configuration
+
+Configuration file **.tokenizer.json** must be located in HOME directory:
 
 ```json
 {
   "OAuth2Services": [
     {
-      "URL": "http://oauth2-service.example/authentication-route",
-      "GrantType": "client_credentials",
-      "ClientId": "1",
-      "ClientSecret": "xxxxxxxxxxxx"
+      "name": "client1",
+      "url": "http://oauth2-service.example/authentication-route",
+      "grantType": "client_credentials",
+      "clientId": "1",
+      "clientSecret": "xxxxxxxxxxxx"
     },
     {
-      "URL": "http://oauth2-service.example/authentication-route",
-      "GrantType": "client_credentials",
-      "ClientId": "2",
-      "ClientSecret": "xxxxxxxxxxxx"
+      "name": "client2",
+      "url": "http://oauth2-service.example/authentication-route",
+      "grantType": "client_credentials",
+      "clientId": "2",
+      "clientSecret": "xxxxxxxxxxxx"
     }
   ]
 }
+```
+
+## Usage
+
+```bash
+$GOPATH/bin/tokenizer
+```
+
+## Example
+
+```bash
+» $GOPATH/bin/tokenizer
+Select the oauth2 service:
+    > client1
+    > client2
+>>> client1
+{
+    "access_token": "947115cd41ae4e9597a4f1d93b9415d5",
+    "expires_in": 3600,
+    "refresh_token": "x7d00ce9b2874c11903da50cf6cabdf1",
+    "token_type": "bearer"
+}%
 ```
