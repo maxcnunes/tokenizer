@@ -3,53 +3,110 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 )
 
-type Configuration struct {
-	URL          string
-	GrantType    string
-	ClientId     string
-	ClientSecret string
+type OAuth2Service struct {
+	Name         string `json:"name"`
+	URL          string `json:"url"`
+	GrantType    string `json:"grantType"`
+	ClientId     string `json:"clientId"`
+	ClientSecret string `json:"clientSecret"`
 }
 
-func main() {
+type Configuration struct {
+	OAuth2Services []OAuth2Service `json:"oAuth2Services"`
+}
+
+func loadConfiguration() (config Configuration, err error) {
+	config = Configuration{}
+
 	file, err := os.Open("tokenizer.json")
 	if err != nil {
-		fmt.Println("Error reading config file", err)
-		return
+		return config, err
 	}
 
 	decoder := json.NewDecoder(file)
-	config := Configuration{}
 
 	err = decoder.Decode(&config)
 	if err != nil {
-		fmt.Println("Error parsing config", err)
-		return
+		return config, err
 	}
 
+	return config, nil
+}
+
+func selectOAuth2ServiceName(config Configuration) (name string, err error) {
+	fmt.Println("Select the oauth2 service:")
+	for _, oAuth2Service := range config.OAuth2Services {
+		fmt.Printf("\t> %s\n", oAuth2Service.Name)
+	}
+	fmt.Print(">>> ")
+
+	_, err = fmt.Scanln(&name)
+	return name, err
+}
+
+func selectOAuth2Service(config Configuration, name string) *OAuth2Service {
+	for _, oAuth2Service := range config.OAuth2Services {
+		if name == oAuth2Service.Name {
+			return &oAuth2Service
+		}
+	}
+	return nil
+}
+
+func request(oAuth2Service *OAuth2Service) (res *http.Response, err error) {
 	urlEncoded := url.Values{}
-	urlEncoded.Add("grant_type", config.GrantType)
-	urlEncoded.Add("client_id", config.ClientId)
-	urlEncoded.Add("client_secret", config.ClientSecret)
-	res, err := http.PostForm(config.URL, urlEncoded)
+	urlEncoded.Add("grant_type", oAuth2Service.GrantType)
+	urlEncoded.Add("client_id", oAuth2Service.ClientId)
+	urlEncoded.Add("client_secret", oAuth2Service.ClientSecret)
+	res, err = http.PostForm(oAuth2Service.URL, urlEncoded)
+	return res, err
+}
 
-	if err != nil {
-		fmt.Println("Error posting", err)
-		return
-	}
-
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
+func printResult(body io.Reader) {
+	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		fmt.Println("Error reading body", err)
 		return
 	}
 
-	fmt.Printf("%s", body)
+	var token map[string]interface{}
+	if err := json.Unmarshal(data, &token); err != nil {
+		panic(err)
+	}
+
+	result, _ := json.MarshalIndent(token, "", "\t")
+	os.Stdout.Write(result)
+}
+
+func main() {
+	config, err := loadConfiguration()
+	if err != nil {
+		log.Fatal("Error reading config file", err)
+	}
+
+	oAuth2ServiceName, err := selectOAuth2ServiceName(config)
+	if err != nil {
+		log.Fatal("Wrong option")
+	}
+
+	oAuth2Service := selectOAuth2Service(config, oAuth2ServiceName)
+	if oAuth2Service == nil {
+		log.Fatal("Service configuration not found")
+	}
+
+	res, err := request(oAuth2Service)
+	if err != nil {
+		log.Fatal("Error posting", err)
+	}
+
+	defer res.Body.Close()
+	printResult(res.Body)
 }
