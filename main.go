@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/user"
 )
 
 type OAuth2Service struct {
@@ -26,7 +27,12 @@ type Configuration struct {
 func loadConfiguration() (config Configuration, err error) {
 	config = Configuration{}
 
-	file, err := os.Open("tokenizer.json")
+	usr, err := user.Current()
+	if err != nil {
+		return config, err
+	}
+
+	file, err := os.Open(usr.HomeDir + "/.tokenizer.json")
 	if err != nil {
 		return config, err
 	}
