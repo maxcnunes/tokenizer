@@ -11,14 +11,16 @@ import (
 	"os"
 )
 
+// OAuth2Service configuration
 type OAuth2Service struct {
 	Name         string `json:"name"`
 	URL          string `json:"url"`
 	GrantType    string `json:"grantType"`
-	ClientId     string `json:"clientId"`
+	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
 }
 
+// Configuration contains a list of OAuth2Services
 type Configuration struct {
 	OAuth2Services []OAuth2Service `json:"oAuth2Services"`
 }
@@ -64,7 +66,7 @@ func selectOAuth2Service(config Configuration, name string) *OAuth2Service {
 func request(oAuth2Service *OAuth2Service) (res *http.Response, err error) {
 	urlEncoded := url.Values{}
 	urlEncoded.Add("grant_type", oAuth2Service.GrantType)
-	urlEncoded.Add("client_id", oAuth2Service.ClientId)
+	urlEncoded.Add("client_id", oAuth2Service.ClientID)
 	urlEncoded.Add("client_secret", oAuth2Service.ClientSecret)
 	res, err = http.PostForm(oAuth2Service.URL, urlEncoded)
 	return res, err
