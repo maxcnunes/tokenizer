@@ -43,12 +43,26 @@ $GOPATH/bin/tokenizer
 
 ## Example
 
+### Select options
+
 ```bash
 » $GOPATH/bin/tokenizer
 Select the oauth2 service:
     > client1
     > client2
 >>> client1
+{
+    "access_token": "947115cd41ae4e9597a4f1d93b9415d5",
+    "expires_in": 3600,
+    "refresh_token": "x7d00ce9b2874c11903da50cf6cabdf1",
+    "token_type": "bearer"
+}%
+```
+
+### Single command
+
+```bash
+» $GOPATH/bin/tokenizer -name client1
 {
     "access_token": "947115cd41ae4e9597a4f1d93b9415d5",
     "expires_in": 3600,

@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -61,9 +62,9 @@ func selectOAuth2ServiceName(config Configuration) (name string, err error) {
 	return name, err
 }
 
-func selectOAuth2Service(config Configuration, name string) *OAuth2Service {
+func selectOAuth2Service(config Configuration, name *string) *OAuth2Service {
 	for _, oAuth2Service := range config.OAuth2Services {
-		if name == oAuth2Service.Name {
+		if *name == oAuth2Service.Name {
 			return &oAuth2Service
 		}
 	}
@@ -96,6 +97,9 @@ func printResult(body io.Reader) {
 }
 
 func main() {
+	oAuth2ServiceName := flag.String("name", "", "oauth2 service name")
+	flag.Parse()
+
 	http.DefaultTransport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -105,9 +109,10 @@ func main() {
 		log.Fatal("Error reading config file", err)
 	}
 
-	oAuth2ServiceName, err := selectOAuth2ServiceName(config)
-	if err != nil {
-		log.Fatal("Wrong option")
+	if *oAuth2ServiceName == "" {
+		if *oAuth2ServiceName, err = selectOAuth2ServiceName(config); err != nil {
+			log.Fatal("Wrong option", err)
+		}
 	}
 
 	oAuth2Service := selectOAuth2Service(config, oAuth2ServiceName)
