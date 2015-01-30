@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/user"
 )
 
 // OAuth2Service configuration
@@ -28,7 +30,12 @@ type Configuration struct {
 func loadConfiguration() (config Configuration, err error) {
 	config = Configuration{}
 
-	file, err := os.Open("tokenizer.json")
+	usr, err := user.Current()
+	if err != nil {
+		return config, err
+	}
+
+	file, err := os.Open(usr.HomeDir + "/.tokenizer.json")
 	if err != nil {
 		return config, err
 	}
@@ -89,6 +96,10 @@ func printResult(body io.Reader) {
 }
 
 func main() {
+	http.DefaultTransport = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	config, err := loadConfiguration()
 	if err != nil {
 		log.Fatal("Error reading config file", err)
