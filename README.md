@@ -6,6 +6,12 @@ Working with micro services and oauth2 authentications can cause such hard work 
 
 ## Install
 
+### From binary
+
+[Releases](https://github.com/maxcnunes/tokenizer/releases)
+
+### With Go
+
 ```bash
 go get -u github.com/maxcnunes/tokenizer
 ```
@@ -69,4 +75,12 @@ Select the oauth2 service:
     "refresh_token": "x7d00ce9b2874c11903da50cf6cabdf1",
     "token_type": "bearer"
 }%
+```
+
+## Build
+
+Using [goxc](https://github.com/laher/goxc).
+
+```bash
+goxc
 ```
