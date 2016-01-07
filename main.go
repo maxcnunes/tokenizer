@@ -98,7 +98,13 @@ func printResult(body io.Reader) {
 
 func main() {
 	oAuth2ServiceName := flag.String("name", "", "oauth2 service name")
+	version := flag.Bool("v", false, "show the current version")
 	flag.Parse()
+
+	if *version {
+		fmt.Println("tokenizer version 1.0.0")
+		return
+	}
 
 	http.DefaultTransport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
