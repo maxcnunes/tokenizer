@@ -1,5 +1,5 @@
 local:
-  image: golang:1.3
+  image: golang:1.7
   command: go run src/tokenizer/main.go
   volumes:
     - .:/go/src/tokenizer
