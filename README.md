@@ -13,8 +13,8 @@ Working with micro services and oauth2 authentications can cause such hard work 
 **Example installing version 1.0.0 on Linux 64**
 
 ```bash
-wget -q -O /usr/local/bin/tokenizer https://github.com/maxcnunes/tokenizer/releases/download/v1.0.0/tokenizer-linux_amd64 \
-    && chmod +x /usr/local/bin/tokenizer
+sudo wget -q -O /usr/local/bin/tokenizer https://github.com/maxcnunes/tokenizer/releases/download/v1.0.1/tokenizer-linux_amd64 \
+    && sudo chmod +x /usr/local/bin/tokenizer
 ```
 
 ### With Go
